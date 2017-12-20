@@ -1,0 +1,141 @@
+<!-- 
+First we have #f="ngForm" . The #v=thing syntax says that we want to create a local variable for
+this view.
+Here we’re creating an alias to ngForm , for this view, bound to the variable #f . Where did ngForm
+come from in the first place? It came from the NgForm directive.
+And what type of object is ngForm ? It is a FormGroup . That means we can use f as a FormGroup in
+our view. And that’s exactly what we do in the (ngSubmit) output.
+Astute readers might notice that I just said above that NgForm is automatically attached to
+<form> tags (because of the default NgForm selector), which means we don’t have to add an
+ngForm attribute to use NgForm . But here we’re putting ngForm in an attribute (value) tag.
+Is this a typo?
+No, it’s not a typo. If ngForm were the key of the attribute then we would be telling
+Angular that we want to use NgForm on this attribute. In this case, we’re using ngForm
+as the attribute when we’re assigning a reference. That is, we’re saying the value of the
+evaluated expression ngForm should be assigned to a local template variable f .
+ngForm is already on this element and you can think of it as if we are “exporting” this
+FormGroup so that we can reference it elsewhere in our view. -->
+
+
+<!-- <div class="container">
+    <h2 class="text-center">Demo Form: Sku</h2>
+    <form #f="ngForm" (ngSubmit)="onSubmit(f.value)" class="ui form">
+        <div class="text-center">
+            <label for="skuInput">SKU</label>
+            <input type="text" id="skuInput" placeholder="SKU" name="sku" ngModel="Enter name">
+        </div>
+        <button type="submit" class="ui button">Submit----------------_</button>
+    </form>
+</div> -->
+
+
+
+<!-- 
+NgModel vs. ngModel :? -->
+
+<!-- 
+Using FormBuilder--- since
+Building our FormControl s and FormGroup s implicitly using ngForm and ngControl is convenient,
+but doesn’t give us a lot of customization options. A more flexible and common way to configure
+forms is to use a FormBuilder .
+FormBuilder is an aptly-named helper class that helps us build forms. As you recall, forms are made
+up of FormControl s and FormGroup s and the FormBuilder helps us make them (you can think of it
+as a “factory” object).
+Let’s add a FormBuilder to our previous example. Let’s look at:
+how to use the FormBuilder in our component definition class
+• how to use our custom FormGroup on a form in the view -->
+
+
+<!-- 
+Using FormBuilder
+We inject FormBuilder by creating an argument in the constructor of our component class:
+What does inject mean? We haven’t talked much about dependency injection (DI) or
+how DI relates to the hierarchy tree, so that last sentence may not make a lot of sense.
+We talk a lot more about dependency injection in the Dependency Injection chapter, so go
+there if you’d like to learn more about it in depth.
+At a high level, Dependency Injection is -->
+
+
+
+<!-- FB MYfORM 
+Using myForm in the view
+We want to change our <form> to use myForm . If you recall, in the last section we said that ngForm is
+applied for us automatically when we use FormsModule . We also mentioned that ngForm creates its
+own FormGroup . Well, in this case, we don’t want to use an outside FormGroup . Instead we want to
+use our instance variable myForm , which we created with our FormBuilder . How can we do that?
+Angular provides another directive that we use when we have an existing FormGroup : it’s called
+formGroup and we use it like this: -->
+<!-- <div class="container">
+    <h2 class="ui header">Demo Form: Sku with Builder</h2>
+    <form [formGroup]="myForm">
+        <div class="field">
+            <label for="skuInput">SKU</label>
+            <input type="text" id="skuInput" placeholder="SKUFORMBUILDER" [formControl]="myForm.controls['sku']">
+        </div>
+        <button type="submit" class="ui button">Submit</button>
+    </form>
+</div> -->
+<!-- Remember:
+To create a new FormGroup and FormControl s implicitly use:
+• ngForm and
+• ngModel
+But to bind to an existing FormGroup and FormControl s use:
+• formGroup and
+• formControl -->
+
+
+<div class="container">
+
+    <form [formGroup]="myForm" (ngSubmit)="onSubmit(myForm.value)" class="ui form" [class.error]="!myForm.valid && myForm.touched ">
+        <h2 class="ui header">Demo Form: with validations (explicit)</h2>
+        <div class="well">
+            <div class="field" [class.error]="!sku.valid && sku.touched">
+                <label for="skuInput">SKU</label>
+                <input type="text" id="skuInput" placeholder="SKU" [formControl]="myForm.controls['sku']">
+                <div *ngIf="!myForm.controls['sku'].valid" class="ui error message">SKU is invalid using myForm.control property</div>
+                <div *ngIf="myForm.controls['sku'].hasError('required')" class="ui error message">Sku is required</div>
+
+            </div>
+
+            <div class="field" [class.error]="!name.valid && name.touched">
+                <label for="nameInput">name</label>
+                <input type="text" ng-model="number" id="nameInput" placeholder="Namess" [formControl]="myForm.controls['name']">
+                <div *ngIf="myForm.controls['name'].hasError('required')" class="ui error message">name is required</div>
+
+            </div>
+            <div class="field" [class.error]="!name.valid && name.touched">
+
+                <label for="productNameInput">Product Name</label>
+                <input type="text" id="productNameInput" placeholder="Product Name" [formControl]="myForm.get('productName')" [(ngModel)]="productName">
+
+            </div>
+
+
+            <div class="field" [class.error]="!email.valid && email.touched">
+                <label for="EmailInput">Email</label>
+                <input type="text" id="EmailInput" placeholder="Email" [formControl]="myForm.controls['email']">
+                <div *ngIf="!myForm.controls['email'].valid" class="ui error message">EMail is invalid using myForm.control property</div>
+                <div *ngIf="myForm.controls['email'].hasError('required')" class="ui error message">email is required</div>
+                <!-- <div *ngIf="myForm.controls['name'].hasError('invalidName')" class="ui error message">NaME must begin with <span>123</span></div> -->
+                <div *ngIf="myForm.controls['email'].hasError('invalidEmailAddress')" class="ui error message">Email must include <span>@</span></div>
+            </div>
+            <div class="field" [class.error]="!password.valid && password.touched">
+                <label for="pwdInput">PASSWORD</label>
+                <input type="text" id="pwdInput" placeholder="password" [formControl]="myForm.controls['password']">
+                <div *ngIf="myForm.controls['password'].hasError('required')" class="ui error message">password is required</div>
+                <!-- <div *ngIf="myForm.controls['name'].hasError('invalidName')" class="ui error message">NaME must begin with <span>123</span></div> -->
+                <div *ngIf="myForm.controls['password'].hasError('invalidPassword')" class="ui error message">Password must include <span>@</span></div>
+            </div>
+
+
+            <div *ngIf="myForm.valid"><button>save</button></div>
+
+            <div *ngIf="!myForm.valid" class="ui error message">Form is invalid</div>
+
+
+            <div (click)=onSubmit(myForm) class="ui info message">
+                The product name is: {{productName}}
+            </div>
+        </div>
+    </form>
+</div>
